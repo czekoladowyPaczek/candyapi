@@ -12,7 +12,6 @@ var users = require('./routes/users');
 var app = express();
 
 var Config = require("./config/config.js").Config(app);
-console.log(Config.db);
 AWS.config.update(Config.db.update);
 AWS.config.credentials = Config.db.credentials;
 

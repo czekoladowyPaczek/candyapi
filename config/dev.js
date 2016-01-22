@@ -1,12 +1,12 @@
 var AWS = require("aws-sdk");
 
-var Config = {};
+function Config() {
+    this.db = {};
+    this.db.update = {
+        region: "eu-central-1",
+        endpoint: "http://localhost:8000"
+    };
+    this.db.credentials = new AWS.SharedIniFileCredentials({profile: "development"});
+}
 
-Config.db = {};
-Config.db.update = {
-    region: "eu-central-1",
-    endpoint: "http://localhost:8000"
-};
-Config.db.credentials = new AWS.SharedIniFileCredentials({profile: "development"});
-
-module.exports.Config = Config;
+module.exports = Config;
