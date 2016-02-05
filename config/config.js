@@ -1,4 +1,4 @@
-var Config = function(app) {
+var config = function(app) {
     var cfg;
 
     if (app.get('env') === 'production') {
@@ -7,9 +7,9 @@ var Config = function(app) {
         cfg = require("./dev.js");
     }
 
-    return new cfg;
+    return cfg;
 }
 
-module.exports.Config = Config;
+module.exports.config = config;
 
 

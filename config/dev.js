@@ -1,12 +1,5 @@
-var AWS = require("aws-sdk");
+var config = {};
+config.db = {"url":"mongodb://192.168.0.103:27017/candy_db_test"};
+config.secret = "someSuperSecret";
 
-function Config() {
-    this.db = {};
-    this.db.update = {
-        region: "eu-central-1",
-        endpoint: "http://localhost:8000"
-    };
-    this.db.credentials = new AWS.SharedIniFileCredentials({profile: "development"});
-}
-
-module.exports = Config;
+module.exports = config;
