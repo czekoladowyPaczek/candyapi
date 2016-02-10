@@ -6,13 +6,13 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var passport = require('passport');
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
-
-var app = express();
+var app = module.exports = express();
 
 var config = require("./config/config.js").config(app);
 var pass = require('./pass.js')(passport);
+
+var routes = require('./routes/index');
+var users = require('./routes/users');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -65,5 +65,3 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-
-module.exports = app;

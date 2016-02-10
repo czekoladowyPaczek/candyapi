@@ -34,7 +34,7 @@ UserSchema.methods.encryptPassword = function(password) {
 }
 
 UserSchema.methods.checkPassword = function(password) {
-    return this.encryptPassword(password) === this.hashedPassword;
+    return this.encryptPassword(password).toString() === this.hashedPassword;
 };
 
 UserSchema.methods.setPassword = function(password) {
