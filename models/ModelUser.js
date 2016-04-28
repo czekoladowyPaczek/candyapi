@@ -7,7 +7,8 @@ var UserSchema = new Schema({
         type: Number
     },
     email: {
-        type: String
+        type: String,
+        required: true
     },
     name: {
         type: String,
@@ -17,6 +18,9 @@ var UserSchema = new Schema({
         type: Date,
         default: Date.now,
         select: false
+    },
+    picture: {
+        type: String
     }
 }, {collection: 'user'});
 
@@ -24,7 +28,9 @@ UserSchema.set('toJSON', {
     transform: function(doc, ret, options) {
         var retJson = {
             id: ret._id,
-            name: ret.name
+            name: ret.name,
+            email: ret.email,
+            picture: ret.picture
         };
         return retJson;
     }
