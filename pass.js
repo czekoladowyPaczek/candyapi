@@ -1,41 +1,39 @@
-var LocalStrategy = require('passport-local');
 var BearerStrategy = require('passport-http-bearer');
-var ModelUser = require('./models/ModelUser');
+var FacebookStrategy = require('passport-facebook-token');
 
-module.exports = function(passport) {
-    passport.use(new LocalStrategy(
-        {usernameField: 'email', passwordField: 'password', session: false},
-        function(email, password, done) {
-            ModelUser.findOne({email: email}).select('+hashedPassword +salt').exec(function(err, user){
-                if (err) {
-                    return done(err);
+module.exports = function(passport, config, userManager) {
+    passport.use(new FacebookStrategy(
+        {
+            clientID: config.app_id,
+            clientSecret: config.secret
+        },
+        function(accessToken, refreshToken, profile, done) {
+            console.log(profile.id);
+            console.log(profile.displayName);
+
+            userManager.findUserById(profile.id, function(err, user){
+                if (user) {
+                    done(err, user);
+                } else {
+                    userManager.createUser(profile, function(err, user) {
+                        done(err, user);
+                    });
                 }
-                if (!user) {
-                    return done(null, false);
-                }
-                if (!user.checkPassword(password)) {
-                    return done(null, false);
-                }
-                return done(null, user);
             });
         }
     ));
 
     passport.use(new BearerStrategy(
-        function(accessToken, done) {
-            console.log("auth " + accessToken);
-
-
-            ModelUser.findById(token.userId, function (err, user) {
-                if (err) {
-                    return done(err);
-                }
-                if (!user) {
-                    return done(null, false, {message: "Unknown user"});
-                }
-
-                done(null, user, {scope: 'all'});
-            });
+        function(token, done){
+            userManager.findUserByToken(token, done);
         }
     ));
-}
+
+    passport.serializeUser(function(user, done) {
+        done(null, user);
+    });
+
+    passport.deserializeUser(function(user, done) {
+        done(null, user);
+    });
+};

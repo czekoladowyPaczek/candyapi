@@ -1,15 +1,15 @@
-var config = function(app) {
-    var cfg;
+/**
+ * Created by marcingawel on 02.03.2016.
+ */
+var dev = require('./dev');
+var prod = require('./prod');
 
-    if (app.get('env') === 'production') {
-        cfg = require("./prod.js");
+var Config = function(env) {
+    if (env === 'production') {
+        return prod;
     } else {
-        cfg = require("./dev.js");
+        return dev;
     }
+};
 
-    return cfg;
-}
-
-module.exports.config = config;
-
-
+module.exports = Config;

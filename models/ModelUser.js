@@ -3,50 +3,27 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
+    _id: {
+        type: Number
+    },
     email: {
-        type: String,
-        required: true,
-        unique: true
+        type: String
     },
     name: {
         type: String,
-        required : true
-    },
-    hashedPassword: {
-        type: String,
-        required: true,
-        select: false
-    },
-    salt: {
-        type: String,
-        required: true,
-        select: false
+        required: true
     },
     created: {
         type: Date,
         default: Date.now,
         select: false
     }
-});
-
-UserSchema.methods.encryptPassword = function(password) {
-    return crypto.pbkdf2Sync(password, this.salt, 10000, 512);
-}
-
-UserSchema.methods.checkPassword = function(password) {
-    return this.encryptPassword(password).toString() === this.hashedPassword;
-};
-
-UserSchema.methods.setPassword = function(password) {
-    this.salt = crypto.randomBytes(128).toString('hex');
-    this.hashedPassword = this.encryptPassword(password);
-};
+}, {collection: 'user'});
 
 UserSchema.set('toJSON', {
     transform: function(doc, ret, options) {
         var retJson = {
             id: ret._id,
-            email: ret.email,
             name: ret.name
         };
         return retJson;
@@ -54,8 +31,11 @@ UserSchema.set('toJSON', {
 });
 
 UserSchema.virtual('id')
-    .get(function() {
+    .get(function(){
         return this._id;
+    })
+    .set(function(id){
+        this._id = id;
     });
 
 var ModelUser = mongoose.model('ModelUser', UserSchema);

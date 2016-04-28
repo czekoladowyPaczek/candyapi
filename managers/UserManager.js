@@ -1,37 +1,38 @@
 var jwt = require('jsonwebtoken');
-var app = require('../app.js');
-var validator = require('../helpers/validator');
-var ModelError = require('../models/ModelError');
 var ModelUser = require('../models/ModelUser');
 
-var createNewToken = function(user, callback) {
-    var token = jwt.sign({id: user.id, email: user.email}, app.get('superSecret'));
-    callback(null, user, token);
+var UserManager = function(secret) {
+    this.tokenSecret = secret;
 };
 
-var registerUser = function(name, email, password, callback) {
-    if (!validator.isEmail(email)) {
-        callback(ModelError.IncorrectEmail, null, null);
-        return;
+UserManager.prototype.createUser = function(facebookProfile, callback) {
+    var user = new ModelUser({
+        name: facebookProfile.displayName
+    });
+    user.id = facebookProfile.id;
+    if (facebookProfile.emails.length > 0) {
+        user.email = facebookProfile.emails[0].value;
     }
-
-    var user = new ModelUser({email: email, name: name});
-    user.setPassword(password);
-    user.save(function(err) {
+    user.save(function(err){
         if (err) {
-            switch (err.code) {
-                case 11000:
-                    callback(ModelError.EmailAlreadyExists, null, null);
-                    break;
-                default:
-                    callback(ModelError.Unknown, null, null);
-                    break;
-            }
+            callback(err, null);
         } else {
-            createNewToken(user, callback);
+            callback(null, user);
         }
     });
 };
 
-module.exports.register = registerUser;
-module.exports.createToken = createNewToken;
+UserManager.prototype.findUserById = function(id, callback) {
+    ModelUser.findById(id, callback);
+};
+
+UserManager.prototype.findUserByToken = function(token, callback) {
+    var id = jwt.verify(token, this.tokenSecret);
+    ModelUser.findById(id, callback);
+};
+
+UserManager.prototype.createToken = function(user) {
+    return jwt.sign(user.id, this.tokenSecret);
+};
+
+module.exports = UserManager;
