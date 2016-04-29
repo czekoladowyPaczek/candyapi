@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var passport = require('passport');
+var filter = require('content-filter');
 
 var UserManager = require('./managers/UserManager.js');
 
@@ -23,12 +24,15 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
+app.use(filter());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 
 var users = require('./routes/users');
+var friends = require('./routes/friends');
 
 app.use('/user', users(express.Router(), managers.user));
+app.use('/friend', friends(express.Router(), managers.user));
 
 mongoose.connection.on('open', function () {
     console.log('Connected to mongo server.');

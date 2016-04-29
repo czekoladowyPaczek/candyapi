@@ -2,13 +2,28 @@ var crypto = require('crypto');
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+var FriendSchema = new Schema({
+    _id: {
+        type: Number
+    },
+    name: {
+        type: String,
+        required: true
+    },
+    picture: {
+        type: String
+    }
+});
+
 var UserSchema = new Schema({
     _id: {
         type: Number
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true,
+        index: true
     },
     name: {
         type: String,
@@ -21,6 +36,9 @@ var UserSchema = new Schema({
     },
     picture: {
         type: String
+    },
+    friends: {
+        type: [FriendSchema]
     }
 }, {collection: 'user'});
 
@@ -30,7 +48,8 @@ UserSchema.set('toJSON', {
             id: ret._id,
             name: ret.name,
             email: ret.email,
-            picture: ret.picture
+            picture: ret.picture,
+            friends: ret.friends
         };
         return retJson;
     }
