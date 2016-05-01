@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var FriendSchema = new Schema({
-    _id: {
+    id: {
         type: Number
     },
     name: {
@@ -84,7 +84,7 @@ UserSchema.methods.isFriend = function (id) {
 
 UserSchema.methods.addFriend = function (user, status) {
     var friend = {
-        _id: user.id,
+        id: user.id,
         name: user.name,
         picture: user.picture,
         status: status
