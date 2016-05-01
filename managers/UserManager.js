@@ -10,12 +10,6 @@ var UserManager = function (secret) {
         return (content.length > 0 && content[0].value.length > 0);
     };
 
-    this.containsFriend = function (friendList, user) {
-        return friendList.filter(function (e) {
-                return e.id == user.id;
-            }).length > 0;
-    };
-
     this.updateUsers = function (users, callback) {
         async.mapLimit(users, 2, function (user, next) {
             user.save(next);
@@ -79,19 +73,19 @@ UserManager.prototype.addFriend = function (user, email, callback) {
     var basicUser = user;
     var self = this;
     this.findUserByEmail(email, function (error, user) {
-        if (user && !self.containsFriend(basicUser.friends, user)) {
-            basicUser.friends.push(user);
-            user.friends.push(basicUser);
+        if (user && !basicUser.isFriend(user.id)) {
+            basicUser.addFriend(user, ModelUser.FriendStatus.WAITING_ACCEPTANCE);
+            user.addFriend(basicUser, ModelUser.FriendStatus.INVITED);
             self.updateUsers([basicUser, user], function (error) {
                 if (error) {
                     console.log(error);
                     callback(ModelError.Unknown);
                 } else {
-                    callback(null, basicUser);
+                    callback(null, basicUser.friends);
                 }
             });
         } else if (user) {
-            callback(null, basicUser);
+            callback(null, basicUser.friends);
         } else {
             callback(error);
         }
@@ -101,14 +95,25 @@ UserManager.prototype.addFriend = function (user, email, callback) {
 UserManager.prototype.removeFriend = function (user, id, callback) {
     var basicUser = user;
     var self = this;
-    if (this.containsFriend(user.friends, {id : id})) {
+    if (user.isFriend(id)) {
         this.findUserById(id, function(err, user) {
             if (user) {
-
+                basicUser.removeFriend(user.id);
+                user.removeFriend(basicUser.id);
+                self.updateUsers([basicUser, user], function (error) {
+                    if (error) {
+                        console.log(error);
+                        callback(ModelError.Unknown);
+                    } else {
+                        callback(null, basicUser.friends);
+                    }
+                });
+            } else {
+                callback(ModelError.Unknown);
             }
         });
     } else {
-        callback(null, user.friends);
+        callback(null, basicUser.friends);
     }
 };
 
