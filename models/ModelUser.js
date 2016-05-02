@@ -82,7 +82,7 @@ UserSchema.methods.isFriend = function (id) {
         }).length > 0;
 };
 
-UserSchema.methods.addFriend = function (user, status) {
+UserSchema.methods.inviteFriend = function (user, status) {
     var friend = {
         id: user.id,
         name: user.name,
@@ -90,6 +90,19 @@ UserSchema.methods.addFriend = function (user, status) {
         status: status
     };
     this.friends.push(friend);
+};
+
+UserSchema.methods.isInvited = function (id) {
+    return this.friends.filter(function (e) {
+            return e.id == id && e.status === ModelUser.FriendStatus.INVITED;
+        }).length > 0;
+};
+
+UserSchema.methods.acceptFriendInvitation = function (id) {
+    var friend = this.friends.filter(function (e) {
+        return e.id == id && e.status;
+    });
+    friend.status = ModelUser.FriendStatus.ACCEPTED;
 };
 
 var ModelUser = mongoose.model('ModelUser', UserSchema);

@@ -69,13 +69,13 @@ UserManager.prototype.createToken = function (user) {
     return jwt.sign(user.id, this.tokenSecret);
 };
 
-UserManager.prototype.addFriend = function (user, email, callback) {
+UserManager.prototype.inviteFriend = function (user, email, callback) {
     var basicUser = user;
     var self = this;
     this.findUserByEmail(email, function (error, user) {
         if (user && !basicUser.isFriend(user.id)) {
-            basicUser.addFriend(user, ModelUser.FriendStatus.WAITING_ACCEPTANCE);
-            user.addFriend(basicUser, ModelUser.FriendStatus.INVITED);
+            basicUser.inviteFriend(user, ModelUser.FriendStatus.WAITING_ACCEPTANCE);
+            user.inviteFriend(basicUser, ModelUser.FriendStatus.INVITED);
             self.updateUsers([basicUser, user], function (error) {
                 if (error) {
                     console.log(error);
@@ -85,9 +85,9 @@ UserManager.prototype.addFriend = function (user, email, callback) {
                 }
             });
         } else if (user) {
-            callback(null, basicUser.friends);
+            callback(ModelError.AlreadyFriend);
         } else {
-            callback(error);
+            callback(ModelError.NoUser);
         }
     });
 };
@@ -109,11 +109,36 @@ UserManager.prototype.removeFriend = function (user, id, callback) {
                     }
                 });
             } else {
-                callback(ModelError.Unknown);
+                callback(ModelError.NoUser);
             }
         });
     } else {
         callback(null, basicUser.friends);
+    }
+};
+
+UserManager.prototype.acceptFriendInvitation = function (user, id, callback) {
+    var basicUser = user;
+    var self = this;
+    if (basicUser.isInvited(id)) {
+        this.findUserById(id, function (error, user) {
+            if (user) {
+                basicUser.acceptFriendInvitation(id);
+                user.acceptFriendInvitation(basicUser.id);
+                self.updateUsers([basicUser, user], function (err) {
+                    if (err) {
+                        console.log(err);
+                        callback(ModelError.Unknown);
+                    } else {
+                        callback(null, basicUser.friends);
+                    }
+                });
+            } else {
+                callback(ModelError.NoUser);
+            }
+        });
+    } else {
+        callback(ModelError.NotInvited);
     }
 };
 
