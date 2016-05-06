@@ -7,13 +7,15 @@ var mongoose = require('mongoose');
 var passport = require('passport');
 var filter = require('content-filter');
 
-var UserManager = require('./managers/UserManager.js');
+var UserManager = require('./managers/UserManager');
+var ShopListManager = require('./managers/ShopListManager');
 
 var app = module.exports = express();
 
 var config = require("./config/Config.js")(app.get('env'));
 var managers = {
-    user: new UserManager(config.secret)
+    user: new UserManager(config.secret),
+    shop: new ShopListManager()
 };
 var pass = require('./pass.js')(passport, config.facebook, managers.user);
 
@@ -30,9 +32,11 @@ app.use(passport.initialize());
 
 var users = require('./routes/users');
 var friends = require('./routes/friends');
+var shop = require('./routes/shop');
 
 app.use('/user', users(express.Router(), managers.user));
 app.use('/friend', friends(express.Router(), managers.user));
+app.use('/shop', shop(express.Router(), managers.shop));
 
 mongoose.connection.on('open', function () {
     console.log('Connected to mongo server.');

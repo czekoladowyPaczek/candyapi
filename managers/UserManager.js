@@ -5,16 +5,16 @@ var ModelError = require('../models/ModelError');
 
 var UserManager = function (secret) {
     this.tokenSecret = secret;
+};
 
-    this.validateContentExists = function (content) {
-        return (content.length > 0 && content[0].value.length > 0);
-    };
+var validateContentExists = function (content) {
+    return (content.length > 0 && content[0].value.length > 0);
+};
 
-    this.updateUsers = function (users, callback) {
-        async.mapLimit(users, 2, function (user, next) {
-            user.save(next);
-        }, callback);
-    };
+var updateUsers = function (users, callback) {
+    async.mapLimit(users, 2, function (user, next) {
+        user.save(next);
+    }, callback);
 };
 
 UserManager.prototype.createUser = function (facebookProfile, callback) {
@@ -23,9 +23,9 @@ UserManager.prototype.createUser = function (facebookProfile, callback) {
         id: facebookProfile.id
     });
 
-    if (this.validateContentExists(facebookProfile.emails)) {
+    if (validateContentExists(facebookProfile.emails)) {
         user.email = facebookProfile.emails[0].value;
-        if (this.validateContentExists(facebookProfile.photos)) {
+        if (validateContentExists(facebookProfile.photos)) {
             user.picture = facebookProfile.photos[0].value;
         }
         user.save(function (err) {
@@ -71,12 +71,11 @@ UserManager.prototype.createToken = function (user) {
 
 UserManager.prototype.inviteFriend = function (user, email, callback) {
     var basicUser = user;
-    var self = this;
     this.findUserByEmail(email, function (error, user) {
         if (user && !basicUser.isFriend(user.id)) {
             basicUser.inviteFriend(user, ModelUser.FriendStatus.WAITING_ACCEPTANCE);
             user.inviteFriend(basicUser, ModelUser.FriendStatus.INVITED);
-            self.updateUsers([basicUser, user], function (error) {
+            updateUsers([basicUser, user], function (error) {
                 if (error) {
                     console.log(error);
                     callback(ModelError.Unknown);
@@ -94,13 +93,12 @@ UserManager.prototype.inviteFriend = function (user, email, callback) {
 
 UserManager.prototype.removeFriend = function (user, id, callback) {
     var basicUser = user;
-    var self = this;
     if (user.isFriend(id)) {
         this.findUserById(id, function(err, user) {
             if (user) {
                 basicUser.removeFriend(user.id);
                 user.removeFriend(basicUser.id);
-                self.updateUsers([basicUser, user], function (error) {
+                updateUsers([basicUser, user], function (error) {
                     if (error) {
                         console.log(error);
                         callback(ModelError.Unknown);
@@ -119,13 +117,12 @@ UserManager.prototype.removeFriend = function (user, id, callback) {
 
 UserManager.prototype.acceptFriendInvitation = function (user, id, callback) {
     var basicUser = user;
-    var self = this;
     if (basicUser.isInvited(id)) {
         this.findUserById(id, function (error, user) {
             if (user) {
                 basicUser.acceptFriendInvitation(id);
                 user.acceptFriendInvitation(basicUser.id);
-                self.updateUsers([basicUser, user], function (err) {
+                updateUsers([basicUser, user], function (err) {
                     if (err) {
                         console.log(err);
                         callback(ModelError.Unknown);
