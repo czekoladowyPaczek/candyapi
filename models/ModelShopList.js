@@ -5,7 +5,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
-    id: {
+    _id: {
         type: Number,
         index: true
     },
@@ -16,44 +16,53 @@ var UserSchema = new Schema({
     picture: {
         type: String
     }
-}, {_id: false});
+});
 
-var ItemSchema = new Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    count: {
-        type: Number
-    },
-    type: {
-        type: String
-    },
-    modification_date: {
-        type: Date,
-        default: Date.now
-    },
-    deleted: {
-        type: Date
+UserSchema.set('toJSON', {
+    transform: function (doc, ret, options) {
+        var retJson = {
+            id: ret._id,
+            name: ret.name,
+            picture: ret.picture
+        };
+        return retJson;
     }
 });
 
 var ListSchema = new Schema({
+    name: {
+        type: String,
+        required: true
+    },
     owner: {
         type: UserSchema,
         required: true
     },
-    items: {
-        type: [ItemSchema]
+    users: {
+        type: [UserSchema]
     },
     modification_date: {
         type: Date,
         default: Date.now
     },
     deleted: {
-        type: Date
+        type: Date,
+        expires: 172800 //2 days
     }
 }, {collection: "shop_list"});
+
+ListSchema.set('toJSON', {
+    transform: function (doc, ret, options) {
+        var retJson = {
+            id: ret._id,
+            name: ret.name,
+            owner: ret.owner,
+            users: ret.users,
+            modification_date: ret.modification_date
+        };
+        return retJson;
+    }
+});
 
 var ModelShopList = mongoose.model('ModelShopList', ListSchema);
 module.exports = ModelShopList;

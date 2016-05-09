@@ -9,3 +9,5 @@ module.exports.NoUser = {code: 6, message: "Could not find user"};
 module.exports.SelfInvitation = {code: 21, message: "Can't invite self"};
 module.exports.AlreadyFriend = {code: 22, message: "User is already on friend list"};
 module.exports.NotInvited = {code: 23, message: "User was not invited"};
+// list
+module.exports.ListCountLimitExceeded = {code: 31, message: "List count limit exceeded"};
