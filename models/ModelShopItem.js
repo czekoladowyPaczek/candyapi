@@ -9,6 +9,11 @@ var ItemSchema = new Schema({
         type: String,
         required: true
     },
+    list_id: {
+        type: Schema.ObjectId,
+        required: true,
+        index: true
+    },
     count: {
         type: Number
     },
@@ -24,6 +29,19 @@ var ItemSchema = new Schema({
         expires: 172800 // 2 days
     }
 }, {collection: 'shop_item'});
+
+ItemSchema.set('toJSON', {
+    transform: function (doc, ret, options) {
+        var retJson = {
+            id: ret._id,
+            name: ret.name,
+            count: ret.count,
+            type: ret.type,
+            modification_date: ret.modification_date
+        };
+        return retJson;
+    }
+});
 
 var ModelShopItem = mongoose.model('ModelShopItem', ItemSchema);
 module.exports = ModelShopItem;

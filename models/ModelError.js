@@ -11,3 +11,5 @@ module.exports.AlreadyFriend = {code: 22, message: "User is already on friend li
 module.exports.NotInvited = {code: 23, message: "User was not invited"};
 // list
 module.exports.ListCountLimitExceeded = {code: 31, message: "List count limit exceeded"};
+module.exports.ListNotExist = {code: 32, message: "List doesn't exist"};
+module.exports.NotPermitted = {code: 33, message: "Not permitted"};
