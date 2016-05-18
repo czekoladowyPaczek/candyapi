@@ -14,7 +14,7 @@ var ShopListManager = function () {
 };
 
 var userExceededListLimit = function (user, callback) {
-    ModelShopList.count({'owner.id': user.id, deleted: {$exists: false}}, function (err, count) {
+    ModelShopList.count({'owner._id': user.id, deleted: {$exists: false}}, function (err, count) {
         if (err || count >= MAX_USER_LIST_COUNT) {
             callback(true);
         } else {
@@ -51,7 +51,7 @@ ShopListManager.prototype.createShopList = function (user, listName, callback) {
                 if (err) {
                     callback(ModelError.Unknown);
                 } else {
-                    callback(shopList);
+                    callback(null, shopList);
                 }
             });
         }
@@ -89,7 +89,7 @@ ShopListManager.prototype.getShopListItems = function (user, id, callback) {
 ShopListManager.prototype.deleteShopList = function (user, id, callback) {
     ModelShopList.findOne({_id: id, deleted: null}, function (err, list) {
         if (list) {
-            if (list.owner.id === user.id) {
+            if (list.owner.id == user.id) {
                 deleteList(list, function (err) {
                     if (err) {
                         callback(ModelError.Unknown);
@@ -165,7 +165,7 @@ ShopListManager.prototype.deleteUserFromShopList = function (user, userId, listI
             callback(ModelError.CannotRemoveOwner);
         } else if (!shopList.isInvited(userId)) {
             callback(ModelError.UserIsNotInvited);
-        } else if (shopList.owner.id === user.id || user.id === userId) {
+        } else if (shopList.owner.id == user.id || user.id == userId) {
             shopList.removeUser(userId);
             shopList.save(function (err) {
                 if (err) {
