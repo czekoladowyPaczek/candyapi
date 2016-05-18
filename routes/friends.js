@@ -49,7 +49,7 @@ var initialize = function (router, userHandler) {
     router.delete('/:id',
         passport.authenticate('bearer'),
         function (req, res, next) {
-            userHandler.removeFriend(req.user, req.param('id'), function (error, friends) {
+            userHandler.removeFriend(req.user, req.params.id, function (error, friends) {
                 if (error) {
                     res.status(500);
                     res.send(error);

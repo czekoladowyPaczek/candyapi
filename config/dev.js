@@ -3,7 +3,7 @@
  */
 var config = {
     db: {
-        url: "mongodb://192.168.0.104:27017/candyapi_test"
+        url: "mongodb://192.168.0.22:27017/candyapi_test"
     },
     secret: 'superSecret',
     facebook: {
