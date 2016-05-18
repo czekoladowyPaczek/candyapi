@@ -13,3 +13,9 @@ module.exports.NotInvited = {code: 23, message: "User was not invited"};
 module.exports.ListCountLimitExceeded = {code: 31, message: "List count limit exceeded"};
 module.exports.ListNotExist = {code: 32, message: "List doesn't exist"};
 module.exports.NotPermitted = {code: 33, message: "Not permitted"};
+// list invitations
+module.exports.CannotInviteSelf = {code: 41, message: "Cannot invite self"};
+module.exports.CannotRemoveOwner = {code: 42, message: "Cannot remove owner"};
+module.exports.UserIsNotInvited = {code: 43, message: "User has no rights for this list"};
+module.exports.AlreadyInvited = {code: 44, message: "User is already invited for this list"};
+module.exports.NotOnFriendList = {code: 45, message: "User is not on your friend list"};

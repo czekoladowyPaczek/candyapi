@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var FriendSchema = new Schema({
-    id: {
+    _id: {
         type: Number
     },
     name: {
@@ -17,6 +17,26 @@ var FriendSchema = new Schema({
         required: true
     }
 });
+
+FriendSchema.set('toJSON', {
+    transform: function (doc, ret, options) {
+        var retJson = {
+            id: ret._id,
+            name: ret.name,
+            picture: ret.picture,
+            status: ret.status
+        };
+        return retJson;
+    }
+});
+
+FriendSchema.virtual('id')
+    .get(function () {
+        return this._id;
+    })
+    .set(function (id) {
+        this._id = id;
+    });
 
 var UserSchema = new Schema({
     _id: {
@@ -69,7 +89,7 @@ UserSchema.virtual('id')
 UserSchema.methods.removeFriend = function (id) {
     var i = this.friends.length;
     while (i--) {
-        if (this.friends[i] == id) {
+        if (this.friends[i].id == id) {
             this.friends.splice(i, 1);
             break;
         }
@@ -99,10 +119,10 @@ UserSchema.methods.isInvited = function (id) {
 };
 
 UserSchema.methods.acceptFriendInvitation = function (id) {
-    var friend = this.friends.filter(function (e) {
-        return e.id == id && e.status;
+    var friends = this.friends.filter(function (e) {
+        return e.id == id;
     });
-    friend.status = ModelUser.FriendStatus.ACCEPTED;
+    friends[0].status = ModelUser.FriendStatus.ACCEPTED;
 };
 
 var ModelUser = mongoose.model('ModelUser', UserSchema);

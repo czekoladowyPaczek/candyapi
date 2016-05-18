@@ -33,10 +33,12 @@ app.use(passport.initialize());
 var users = require('./routes/users');
 var friends = require('./routes/friends');
 var shop = require('./routes/shop');
+var shopInvitations = require('./routes/shopInvitation');
 
 app.use('/user', users(express.Router(), managers.user));
 app.use('/friend', friends(express.Router(), managers.user));
 app.use('/shop', shop(express.Router(), managers.shop));
+app.use('/shop/invitation', shopInvitations(express.Router(), managers.shop));
 
 mongoose.connection.on('open', function () {
     console.log('Connected to mongo server.');

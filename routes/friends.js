@@ -29,7 +29,7 @@ var initialize = function (router, userHandler) {
                         res.send(friends);
                     }
                 });
-            } else if (!validator.isEmpty(req.body.id)) {
+            } else if (!validator.isNotPresent(req.body.id)) {
                 userHandler.acceptFriendInvitation(req.user, req.body.id, function (error, friends) {
                     if (error) {
                         res.status(500);

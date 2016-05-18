@@ -18,6 +18,14 @@ var UserSchema = new Schema({
     }
 });
 
+UserSchema.virtual('id')
+    .get(function () {
+        return this._id;
+    })
+    .set(function (id) {
+        this._id = id;
+    });
+
 UserSchema.set('toJSON', {
     transform: function (doc, ret, options) {
         var retJson = {
@@ -63,6 +71,22 @@ ListSchema.set('toJSON', {
         return retJson;
     }
 });
+
+ListSchema.methods.isInvited = function(userId) {
+    return this.users.filter(function (e) {
+            return e._id == userId;
+        }).length > 0;
+};
+
+ListSchema.method.removeUser = function(userId) {
+    var i = this.users.length;
+    while (i--) {
+        if (this.users[i].id == userId) {
+            this.users.splice(i, 1);
+            break;
+        }
+    }
+};
 
 var ModelShopList = mongoose.model('ModelShopList', ListSchema);
 module.exports = ModelShopList;
