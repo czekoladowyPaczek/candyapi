@@ -19,3 +19,4 @@ module.exports.CannotRemoveOwner = {code: 42, message: "Cannot remove owner"};
 module.exports.UserIsNotInvited = {code: 43, message: "User has no rights for this list"};
 module.exports.AlreadyInvited = {code: 44, message: "User is already invited for this list"};
 module.exports.NotOnFriendList = {code: 45, message: "User is not on your friend list"};
+module.exports.CannotRemoveSelf = {code: 46, message: "Cannot remove self"};

@@ -78,7 +78,7 @@ ListSchema.methods.isInvited = function(userId) {
         }).length > 0;
 };
 
-ListSchema.method.removeUser = function(userId) {
+ListSchema.methods.removeUser = function(userId) {
     var i = this.users.length;
     while (i--) {
         if (this.users[i].id == userId) {

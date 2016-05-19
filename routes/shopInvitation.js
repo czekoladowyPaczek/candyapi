@@ -17,13 +17,13 @@ var initialize = function (router, shopListManager) {
                 res.status(500);
                 res.send(ModelError.CannotInviteSelf);
             } else {
-                shopListManager.addUserToShopList(req.user, req.body.listId, req.body.userId, function (err, createdList) {
+                shopListManager.addUserToShopList(req.user, req.body.userId, req.body.listId, function (err) {
                     if (err) {
                         res.status(500);
                         res.send(err);
                     } else {
                         res.status(200);
-                        res.send(createdList);
+                        res.send();
                     }
                 });
             }
@@ -38,6 +38,11 @@ var initialize = function (router, shopListManager) {
                 res.status(500);
                 res.send(ModelError.MissingProperties);
                 return;
+            }
+
+            if (req.user.id == req.body.userId) {
+                res.status(500);
+                res.send(ModelError.CannotInviteSelf);
             }
 
             shopListManager.deleteUserFromShopList(req.user, req.body.listId, req.body.userId, function(err) {

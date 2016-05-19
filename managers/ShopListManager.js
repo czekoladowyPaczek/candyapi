@@ -97,6 +97,15 @@ ShopListManager.prototype.deleteShopList = function (user, id, callback) {
                         callback();
                     }
                 });
+            } else if (list.isInvited(user.id)) {
+                list.removeUser(user.id);
+                list.save(function (err) {
+                    if (err) {
+                        callback(ModelError.Unknown);
+                    } else {
+                        callback();
+                    }
+                });
             } else {
                 callback(ModelError.NotPermitted);
             }
@@ -159,13 +168,11 @@ ShopListManager.prototype.deleteUserFromShopList = function (user, userId, listI
     ModelShopList.findOne({_id: listId, deleted: null}, function (err, shopList) {
         if (!shopList) {
             callback(ModelError.ListNotExist);
-        } else if (!shopList.isInvited(user.id)) {
+        } else if (shopList.owner.id != user.id) {
             callback(ModelError.NotPermitted);
-        } else if (shopList.owner.id === userId) {
-            callback(ModelError.CannotRemoveOwner);
         } else if (!shopList.isInvited(userId)) {
             callback(ModelError.UserIsNotInvited);
-        } else if (shopList.owner.id == user.id || user.id == userId) {
+        } else if (user.id != userId && shopList.owner.id == user.id) {
             shopList.removeUser(userId);
             shopList.save(function (err) {
                 if (err) {
