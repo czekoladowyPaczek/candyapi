@@ -63,6 +63,7 @@ var initialize = function (router, shopListManager) {
         '/:id',
         passport.authenticate('bearer', {session: false}),
         function (req, res, next) {
+            console.log("test " + req.params.id);
             shopListManager.deleteShopList(req.user, req.params.id, function (err) {
                 if (err) {
                     res.status(500);

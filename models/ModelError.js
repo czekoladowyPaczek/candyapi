@@ -16,7 +16,7 @@ module.exports.NotPermitted = {code: 33, message: "Not permitted"};
 // list invitations
 module.exports.CannotInviteSelf = {code: 41, message: "Cannot invite self"};
 module.exports.CannotRemoveOwner = {code: 42, message: "Cannot remove owner"};
-module.exports.UserIsNotInvited = {code: 43, message: "User has no rights for this list"};
+module.exports.UserIsNotInvited = {code: 43, message: "User is not invited for this list"};
 module.exports.AlreadyInvited = {code: 44, message: "User is already invited for this list"};
-module.exports.NotOnFriendList = {code: 45, message: "User is not on your friend list"};
+module.exports.NotOnFriendList = {code: 45, message: "User is not on your friend list or didn't accept invitation"};
 module.exports.CannotRemoveSelf = {code: 46, message: "Cannot remove self"};

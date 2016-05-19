@@ -42,10 +42,10 @@ var initialize = function (router, shopListManager) {
 
             if (req.user.id == req.body.userId) {
                 res.status(500);
-                res.send(ModelError.CannotInviteSelf);
+                res.send(ModelError.CannotRemoveSelf);
             }
 
-            shopListManager.deleteUserFromShopList(req.user, req.body.listId, req.body.userId, function(err) {
+            shopListManager.deleteUserFromShopList(req.user, req.body.userId, req.body.listId, function(err) {
                 if (err) {
                     res.status(500);
                     res.send(err);

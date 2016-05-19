@@ -38,7 +38,7 @@ var shopInvitations = require('./routes/shopInvitation');
 app.use('/user', users(express.Router(), managers.user));
 app.use('/friend', friends(express.Router(), managers.user));
 app.use('/shop', shop(express.Router(), managers.shop));
-app.use('/shop/invitation', shopInvitations(express.Router(), managers.shop));
+app.use('/invitation/shop', shopInvitations(express.Router(), managers.shop));
 
 mongoose.connection.on('open', function () {
     console.log('Connected to mongo server.');
