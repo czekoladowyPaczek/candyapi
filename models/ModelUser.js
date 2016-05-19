@@ -98,6 +98,12 @@ UserSchema.methods.removeFriend = function (id) {
 
 UserSchema.methods.isFriend = function (id) {
     return this.friends.filter(function (e) {
+            return e.id == id && e.status == ModelUser.FriendStatus.ACCEPTED;
+        }).length > 0;
+};
+
+UserSchema.methods.isOnFriendList = function (id) {
+    return this.friends.filter(function (e) {
             return e.id == id;
         }).length > 0;
 };
@@ -114,7 +120,7 @@ UserSchema.methods.inviteFriend = function (user, status) {
 
 UserSchema.methods.isInvited = function (id) {
     return this.friends.filter(function (e) {
-            return e.id == id && e.status === ModelUser.FriendStatus.INVITED;
+            return e.id == id && e.status == ModelUser.FriendStatus.INVITED;
         }).length > 0;
 };
 
