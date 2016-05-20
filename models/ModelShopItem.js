@@ -4,6 +4,14 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+var ItemType = {
+    PIECE: 'pcs',
+    GRAM: 'g',
+    KILOGRAM: 'kg',
+    MILLILITER: 'ml',
+    LITER: 'l'
+};
+
 var ItemSchema = new Schema({
     name: {
         type: String,
@@ -15,10 +23,17 @@ var ItemSchema = new Schema({
         index: true
     },
     count: {
-        type: Number
+        type: Number,
+        required: true
+    },
+    bought: {
+        type: Number,
+        default: 0
     },
     type: {
-        type: String
+        type: String,
+        required: true,
+        enum: [ItemType.GRAM, ItemType.KILOGRAM, ItemType.LITER, ItemType.MILLILITER, ItemType.PIECE]
     },
     modification_date: {
         type: Date,
@@ -44,4 +59,5 @@ ItemSchema.set('toJSON', {
 });
 
 var ModelShopItem = mongoose.model('ModelShopItem', ItemSchema);
+ModelShopItem.ItemType = ItemType;
 module.exports = ModelShopItem;

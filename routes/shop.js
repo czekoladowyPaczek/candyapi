@@ -6,16 +6,35 @@ var ModelError = require('../models/ModelError');
 var ModelShopItem = require('../models/ModelShopItem');
 var Ajv = require('ajv');
 
-var initValidator = function() {
+var initValidator = function () {
     var ajv = new Ajv({});
     ajv.addSchema({
         'properties': {
-            'name' : {
+            'name': {
                 'type': 'string'
             }
         },
         'required': ['name']
-    }, 'postShopList');
+    }, 'createShopList');
+    ajv.addSchema({
+        'properties': {
+            'name': {
+                'type': 'string'
+            },
+            'listId': {
+                'type': 'string'
+            },
+            'count': {
+                'type': 'number',
+                'minimum': 0
+            },
+            'type': {
+                'enum': [ModelShopItem.ItemType.GRAM, ModelShopItem.ItemType.KILOGRAM, ModelShopItem.ItemType.LITER,
+                    ModelShopItem.ItemType.MILLILITER, ModelShopItem.ItemType.PIECE]
+            }
+        },
+        'required': ['name', 'listId', 'count', 'type']
+    }, 'createShopItem');
     return ajv;
 };
 
@@ -42,7 +61,7 @@ var initialize = function (router, shopListManager) {
         '/',
         passport.authenticate('bearer', {session: false}),
         function (req, res, next) {
-            if (!ajv.validate('postShopList', req.body)) {
+            if (!ajv.validate('createShopList', req.body)) {
                 res.status(500);
                 res.send(ModelError.MissingProperties);
             } else {
