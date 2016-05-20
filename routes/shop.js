@@ -3,6 +3,7 @@
  */
 var passport = require('passport');
 var ModelError = require('../models/ModelError');
+var ModelShopItem = require('../models/ModelShopItem');
 var validator = require('../helpers/validator');
 
 var initialize = function (router, shopListManager) {
@@ -17,22 +18,6 @@ var initialize = function (router, shopListManager) {
                 } else {
                     res.status(200);
                     res.send(lists);
-                }
-            });
-        }
-    );
-
-    router.get(
-        '/:id',
-        passport.authenticate('bearer', {session: false}),
-        function (req, res, next) {
-            shopListManager.getShopListItems(req.user, req.params.id, function (err, items) {
-                if (err) {
-                    res.status(500);
-                    res.send(err);
-                } else {
-                    res.status(200);
-                    res.send(items);
                 }
             });
         }
@@ -73,6 +58,54 @@ var initialize = function (router, shopListManager) {
                     res.send({message: "deleted"});
                 }
             });
+        }
+    );
+
+    router.get(
+        '/:id',
+        passport.authenticate('bearer', {session: false}),
+        function (req, res, next) {
+            shopListManager.getShopListItems(req.user, req.params.id, function (err, items) {
+                if (err) {
+                    res.status(500);
+                    res.send(err);
+                } else {
+                    res.status(200);
+                    res.send(items);
+                }
+            });
+        }
+    );
+
+    router.post(
+        '/:listId/item',
+        passport.authenticate('bearer', {session: false}),
+        function (req, res, next) {
+            var shopItem = new ModelShopItem({
+                name: req.body.name,
+                listId: req.params.listId,
+                count: req.body.count,
+                type: req.body.type
+            });
+            shopListManager.createShopItem(req.user, req.params.listId, function () {
+
+            });
+        }
+    );
+
+    router.post(
+        '/:listId/item/:itemId',
+        passport.authenticate('bearer', {session: false}),
+        function (req, res, next) {
+
+        }
+    );
+
+    router.delete(
+        '/:listId/item/:itemId',
+        passport.authenticate('bearer', {session: false}),
+        function (req, res, next) {
+
         }
     );
 

@@ -9,7 +9,7 @@ var ItemSchema = new Schema({
         type: String,
         required: true
     },
-    list_id: {
+    listId: {
         type: Schema.ObjectId,
         required: true,
         index: true
