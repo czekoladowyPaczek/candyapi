@@ -4,9 +4,24 @@
 var passport = require('passport');
 var ModelError = require('../models/ModelError');
 var ModelShopItem = require('../models/ModelShopItem');
-var validator = require('../helpers/validator');
+var Ajv = require('ajv');
+
+var initValidator = function() {
+    var ajv = new Ajv({});
+    ajv.addSchema({
+        'properties': {
+            'name' : {
+                'type': 'string'
+            }
+        },
+        'required': ['name']
+    }, 'postShopList');
+    return ajv;
+};
 
 var initialize = function (router, shopListManager) {
+    var ajv = initValidator();
+
     router.get(
         '/',
         passport.authenticate('bearer', {session: false}),
@@ -27,7 +42,7 @@ var initialize = function (router, shopListManager) {
         '/',
         passport.authenticate('bearer', {session: false}),
         function (req, res, next) {
-            if (validator.isEmpty(req.body.name)) {
+            if (!ajv.validate('postShopList', req.body)) {
                 res.status(500);
                 res.send(ModelError.MissingProperties);
             } else {

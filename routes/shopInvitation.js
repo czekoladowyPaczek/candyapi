@@ -3,14 +3,32 @@
  */
 var passport = require('passport');
 var ModelError = require('../models/ModelError');
-var validator = require('../helpers/validator');
+var Ajv = require('ajv');
+
+var initValidator = function() {
+    var ajv = new Ajv({});
+    ajv.addSchema({
+        'properties': {
+            'listId' : {
+                'type': 'string'
+            },
+            'userId': {
+                'type': 'number'
+            }
+        },
+        'required': ['listId', 'userId']
+    }, 'invitation');
+    return ajv;
+};
 
 var initialize = function (router, shopListManager) {
+    var ajv = initValidator();
+
     router.post(
         '/',
         passport.authenticate('bearer', {session: false}),
         function (req, res, next) {
-            if (validator.isEmpty(req.body.listId) || validator.isNotPresent(req.body.userId)) {
+            if (!ajv.validate(req.body, 'invitation')) {
                 res.status(500);
                 res.send(ModelError.MissingProperties);
             } else if (req.user.id == req.body.userId) {
@@ -34,7 +52,7 @@ var initialize = function (router, shopListManager) {
         '/',
         passport.authenticate('bearer', {session: false}),
         function (req, res, next) {
-            if (validator.isEmpty(req.body.listId) || validator.isNotPresent(req.body.userId)) {
+            if (!ajv.validate(req.body, 'invitation')) {
                 res.status(500);
                 res.send(ModelError.MissingProperties);
                 return;
