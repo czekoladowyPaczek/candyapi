@@ -72,13 +72,13 @@ ListSchema.set('toJSON', {
     }
 });
 
-ListSchema.methods.isInvited = function(userId) {
+ListSchema.methods.isInvited = function (userId) {
     return this.users.filter(function (e) {
             return e._id == userId;
         }).length > 0;
 };
 
-ListSchema.methods.removeUser = function(userId) {
+ListSchema.methods.removeUser = function (userId) {
     var i = this.users.length;
     while (i--) {
         if (this.users[i].id == userId) {

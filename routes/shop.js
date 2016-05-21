@@ -38,6 +38,16 @@ var initValidator = function () {
     return ajv;
 };
 
+var sendResponse = function(res, err, response) {
+    if (err) {
+        res.status(500);
+        res.send(err);
+    } else {
+        res.status(200);
+        res.send(response);
+    }
+};
+
 var initialize = function (router, shopListManager) {
     var ajv = initValidator();
 
@@ -46,13 +56,7 @@ var initialize = function (router, shopListManager) {
         passport.authenticate('bearer', {session: false}),
         function (req, res, next) {
             shopListManager.getShopLists(req.user, function (err, lists) {
-                if (err) {
-                    res.status(500);
-                    res.send(err);
-                } else {
-                    res.status(200);
-                    res.send(lists);
-                }
+                sendResponse(res, err, lists);
             });
         }
     );
@@ -66,13 +70,7 @@ var initialize = function (router, shopListManager) {
                 res.send(ModelError.MissingProperties);
             } else {
                 shopListManager.createShopList(req.user, req.body.name, function (err, createdList) {
-                    if (err) {
-                        res.status(500);
-                        res.send(err);
-                    } else {
-                        res.status(200);
-                        res.send(createdList);
-                    }
+                    sendResponse(res, err, createdList);
                 });
             }
         }
@@ -84,13 +82,7 @@ var initialize = function (router, shopListManager) {
         function (req, res, next) {
             console.log("test " + req.params.id);
             shopListManager.deleteShopList(req.user, req.params.id, function (err) {
-                if (err) {
-                    res.status(500);
-                    res.send(err);
-                } else {
-                    res.status(200);
-                    res.send({message: "deleted"});
-                }
+                sendResponse(res, err, {message: "deleted"});
             });
         }
     );
@@ -100,13 +92,7 @@ var initialize = function (router, shopListManager) {
         passport.authenticate('bearer', {session: false}),
         function (req, res, next) {
             shopListManager.getShopListItems(req.user, req.params.id, function (err, items) {
-                if (err) {
-                    res.status(500);
-                    res.send(err);
-                } else {
-                    res.status(200);
-                    res.send(items);
-                }
+                sendResponse(res, err, items);
             });
         }
     );
@@ -115,14 +101,20 @@ var initialize = function (router, shopListManager) {
         '/:listId/item',
         passport.authenticate('bearer', {session: false}),
         function (req, res, next) {
+            if (!ajv.validate(req.body, 'createShopItem')) {
+                res.status(500);
+                return res.send(ModelError.MissingProperties);
+            }
+
             var shopItem = new ModelShopItem({
                 name: req.body.name,
                 listId: req.params.listId,
                 count: req.body.count,
                 type: req.body.type
             });
-            shopListManager.createShopItem(req.user, req.params.listId, function () {
 
+            shopListManager.createShopItem(req.user, shopItem, function (err, shopItem) {
+                sendResponse(res, err, shopItem);
             });
         }
     );

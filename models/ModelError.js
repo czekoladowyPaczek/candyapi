@@ -20,3 +20,4 @@ module.exports.UserIsNotInvited = {code: 43, message: "User is not invited for t
 module.exports.AlreadyInvited = {code: 44, message: "User is already invited for this list"};
 module.exports.NotOnFriendList = {code: 45, message: "User is not on your friend list or didn't accept invitation"};
 module.exports.CannotRemoveSelf = {code: 46, message: "Cannot remove self"};
+module.exports.ListSizeLimitExceeded = {code: 47, message: "Shop list has too many items"};

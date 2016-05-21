@@ -7,7 +7,8 @@ var ModelUser = require('../models/ModelUser');
 var ModelError = require('../models/ModelError');
 var async = require('async');
 
-var MAX_USER_LIST_COUNT = 5;
+var USER_LIST_COUNT_LIMIT = 5;
+var USER_LIST_SIZE_LIMIT = 100;
 
 var ShopListManager = function () {
 
@@ -15,11 +16,13 @@ var ShopListManager = function () {
 
 var userExceededListLimit = function (user, callback) {
     ModelShopList.count({'owner._id': user.id, deleted: {$exists: false}}, function (err, count) {
-        if (err || count >= MAX_USER_LIST_COUNT) {
-            callback(true);
-        } else {
-            callback(false);
-        }
+        callback(err || count >= USER_LIST_COUNT_LIMIT);
+    });
+};
+
+var listExceededSizeLimit = function (listId, callback) {
+    ModelShopItem.count({listId: listId, deleted: null}, function (err, count) {
+        callback(err || count >= USER_LIST_SIZE_LIMIT);
     });
 };
 
@@ -183,6 +186,29 @@ ShopListManager.prototype.deleteUserFromShopList = function (user, userId, listI
             });
         } else {
             callback(ModelError.NotPermitted);
+        }
+    });
+};
+
+ShopListManager.prototype.createShopItem = function (user, listItem, callback) {
+    ModelShopList.findOne({_id: listItem.id, deleted: null}, function (err, shopList) {
+        if (err) {
+            callback(ModelError.Unknown);
+        } else if (!shopList || !shopList.isInvited(user.id)) {
+            callback(ModelError.NotPermitted);
+        } else {
+            listExceededSizeLimit(listItem.listId, function (exceeded) {
+                if (exceeded) {
+                    return callback(ModelError.ListSizeLimitExceeded);
+                }
+
+                listItem.save(function (err) {
+                    if (err)
+                        return callback(ModelError.Unknown);
+
+                    callback(null, listItem);
+                });
+            });
         }
     });
 };
