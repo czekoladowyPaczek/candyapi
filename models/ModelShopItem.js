@@ -30,7 +30,7 @@ var ItemSchema = new Schema({
         type: Number,
         default: 0
     },
-    type: {
+    metric: {
         type: String,
         required: true,
         enum: [ItemType.GRAM, ItemType.KILOGRAM, ItemType.LITER, ItemType.MILLILITER, ItemType.PIECE]
@@ -51,7 +51,8 @@ ItemSchema.set('toJSON', {
             id: ret._id,
             name: ret.name,
             count: ret.count,
-            type: ret.type,
+            metric: ret.metric,
+            bought: ret.bought,
             modification_date: ret.modification_date
         };
         return retJson;

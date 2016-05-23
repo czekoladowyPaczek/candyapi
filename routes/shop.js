@@ -21,14 +21,11 @@ var initValidator = function () {
             'name': {
                 'type': 'string'
             },
-            'listId': {
-                'type': 'string'
-            },
             'count': {
                 'type': 'number',
                 'minimum': 0
             },
-            'type': {
+            'metric': {
                 'enum': [ModelShopItem.ItemType.GRAM, ModelShopItem.ItemType.KILOGRAM, ModelShopItem.ItemType.LITER,
                     ModelShopItem.ItemType.MILLILITER, ModelShopItem.ItemType.PIECE]
             }
@@ -44,7 +41,7 @@ var initValidator = function () {
                 'type': 'number',
                 'minimum': 0
             },
-            'type': {
+            'metric': {
                 'enum': [ModelShopItem.ItemType.GRAM, ModelShopItem.ItemType.KILOGRAM, ModelShopItem.ItemType.LITER,
                     ModelShopItem.ItemType.MILLILITER, ModelShopItem.ItemType.PIECE]
             },
@@ -129,7 +126,7 @@ var initialize = function (router, shopListManager) {
                 name: req.body.name,
                 listId: req.params.listId,
                 count: req.body.count,
-                type: req.body.type
+                metric: req.body.metric
             });
 
             shopListManager.createShopItem(req.user, shopItem, function (err, shopItem) {
@@ -150,7 +147,7 @@ var initialize = function (router, shopListManager) {
             const args = {
                 'name': req.body.name,
                 'count': req.body.count,
-                'type': req.body.type,
+                'metric': req.body.metric,
                 'bought': req.body.bought
             };
 

@@ -23,3 +23,4 @@ module.exports.CannotRemoveSelf = {code: 46, message: "Cannot remove self"};
 module.exports.ListSizeLimitExceeded = {code: 47, message: "Shop list has too many items"};
 //shop list item
 module.exports.ShopItemNotChanged = {code: 51, message: "Nothing to change"};
+module.exports.ShopItemNotExists = {code: 52, message: "Item doesn't exists"};

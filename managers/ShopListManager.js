@@ -88,24 +88,6 @@ ShopListManager.prototype.getShopLists = function (user, callback) {
     });
 };
 
-ShopListManager.prototype.getShopListItems = function (user, id, callback) {
-    ModelShopList.findOne({_id: id, 'users._id': user.id, deleted: null}, function (err, list) {
-        if (list) {
-            ModelShopItem.find({list_id: id}, function (err, items) {
-                if (err) {
-                    callback(ModelError.Unknown);
-                } else {
-                    callback(null, items);
-                }
-            });
-        } else if (err) {
-            callback(ModelError.Unknown);
-        } else {
-            callback(ModelError.ListNotExist);
-        }
-    });
-};
-
 ShopListManager.prototype.deleteShopList = function (user, id, callback) {
     ModelShopList.findOne({_id: id, deleted: null}, function (err, list) {
         if (list) {
@@ -207,8 +189,26 @@ ShopListManager.prototype.deleteUserFromShopList = function (user, userId, listI
     });
 };
 
+ShopListManager.prototype.getShopListItems = function (user, id, callback) {
+    ModelShopList.findOne({_id: id, 'users._id': user.id, deleted: null}, function (err, list) {
+        if (list) {
+            ModelShopItem.find({listId: id, deleted: null}, function (err, items) {
+                if (err) {
+                    callback(ModelError.Unknown);
+                } else {
+                    callback(null, items);
+                }
+            });
+        } else if (err) {
+            callback(ModelError.Unknown);
+        } else {
+            callback(ModelError.ListNotExist);
+        }
+    });
+};
+
 ShopListManager.prototype.createShopItem = function (user, listItem, callback) {
-    ModelShopList.findOne({_id: listItem.id, deleted: null}, function (err, shopList) {
+    ModelShopList.findOne({_id: listItem.listId, deleted: null}, function (err, shopList) {
         if (err) {
             callback(ModelError.Unknown);
         } else if (!shopList || !shopList.isInvited(user.id)) {
@@ -234,8 +234,10 @@ ShopListManager.prototype.updateShopItem = function (user, listId, listItemId, a
     getShopItem(user.id, listId, listItemId, function (err, shopList, shopItem) {
         if (err) {
             return callback(ModelError.Unknown);
-        } else if (!shopList || !shopItem) {
+        } else if (!shopList) {
             return callback(ModelError.ListNotExist);
+        } else if (!shopItem) {
+            return callback(ModelError.ShopItemNotExists);
         }
 
         var changed = false;
@@ -247,12 +249,15 @@ ShopListManager.prototype.updateShopItem = function (user, listId, listItemId, a
             shopItem.count = args.count;
             changed = true;
         }
-        if (args.type) {
-            shopItem.type = args.type;
+        if (args.metric) {
+            shopItem.metric = args.metric;
             changed = true;
         }
         if (args.bought) {
             shopItem.bought = args.bought;
+            if (shopItem.bought > shopItem.count) {
+                shopItem.bought = shopItem.count;
+            }
             changed = true;
         }
 
@@ -272,8 +277,10 @@ ShopListManager.prototype.removeShopItem = function (user, listId, listItemId, c
     getShopItem(user.id, listId, listItemId, function (err, shopList, shopItem) {
         if (err) {
             return callback(ModelError.Unknown);
-        } else if (!shopList || !shopItem) {
+        } else if (!shopList) {
             return callback(ModelError.ListNotExist);
+        } else if (!shopItem) {
+            return callback(ModelError.ShopItemNotExists);
         }
 
         shopItem.deleted = Date.now();
