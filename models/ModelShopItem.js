@@ -4,21 +4,36 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+var ItemType = {
+    PIECE: 'pcs',
+    GRAM: 'g',
+    KILOGRAM: 'kg',
+    MILLILITER: 'ml',
+    LITER: 'l'
+};
+
 var ItemSchema = new Schema({
     name: {
         type: String,
         required: true
     },
-    list_id: {
+    listId: {
         type: Schema.ObjectId,
         required: true,
         index: true
     },
     count: {
-        type: Number
+        type: Number,
+        required: true
     },
-    type: {
-        type: String
+    bought: {
+        type: Number,
+        default: 0
+    },
+    metric: {
+        type: String,
+        required: true,
+        enum: [ItemType.GRAM, ItemType.KILOGRAM, ItemType.LITER, ItemType.MILLILITER, ItemType.PIECE]
     },
     modification_date: {
         type: Date,
@@ -36,7 +51,8 @@ ItemSchema.set('toJSON', {
             id: ret._id,
             name: ret.name,
             count: ret.count,
-            type: ret.type,
+            metric: ret.metric,
+            bought: ret.bought,
             modification_date: ret.modification_date
         };
         return retJson;
@@ -44,4 +60,5 @@ ItemSchema.set('toJSON', {
 });
 
 var ModelShopItem = mongoose.model('ModelShopItem', ItemSchema);
+ModelShopItem.ItemType = ItemType;
 module.exports = ModelShopItem;

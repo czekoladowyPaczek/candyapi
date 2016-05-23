@@ -1,6 +1,12 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+var FriendStatus = {
+    INVITED: 'I',
+    WAITING_ACCEPTANCE: 'W',
+    ACCEPTED: 'A'
+};
+
 var FriendSchema = new Schema({
     _id: {
         type: Number
@@ -14,7 +20,8 @@ var FriendSchema = new Schema({
     },
     status: { // A-accepted, I-invited, W-waiting acceptance
         type: String,
-        required: true
+        required: true,
+        enum: [FriendStatus.ACCEPTED, FriendStatus.INVITED, FriendStatus.WAITING_ACCEPTANCE]
     }
 });
 
@@ -98,6 +105,12 @@ UserSchema.methods.removeFriend = function (id) {
 
 UserSchema.methods.isFriend = function (id) {
     return this.friends.filter(function (e) {
+            return e.id == id && e.status == ModelUser.FriendStatus.ACCEPTED;
+        }).length > 0;
+};
+
+UserSchema.methods.isOnFriendList = function (id) {
+    return this.friends.filter(function (e) {
             return e.id == id;
         }).length > 0;
 };
@@ -114,7 +127,7 @@ UserSchema.methods.inviteFriend = function (user, status) {
 
 UserSchema.methods.isInvited = function (id) {
     return this.friends.filter(function (e) {
-            return e.id == id && e.status === ModelUser.FriendStatus.INVITED;
+            return e.id == id && e.status == ModelUser.FriendStatus.INVITED;
         }).length > 0;
 };
 
@@ -126,10 +139,6 @@ UserSchema.methods.acceptFriendInvitation = function (id) {
 };
 
 var ModelUser = mongoose.model('ModelUser', UserSchema);
-ModelUser.FriendStatus = {
-    INVITED: 'I',
-    WAITING_ACCEPTANCE: 'W',
-    ACCEPTED: 'A'
-};
+ModelUser.FriendStatus = FriendStatus;
 
 module.exports = ModelUser;

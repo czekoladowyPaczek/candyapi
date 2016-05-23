@@ -1,8 +1,32 @@
 var passport = require('passport');
 var ModelError = require('../models/ModelError');
-var validator = require('../helpers/validator');
+var Ajv = require('ajv');
+
+var initValidator = function() {
+    var ajv = new Ajv({});
+    ajv.addSchema({
+        'properties': {
+            'email' : {
+                'type': 'string',
+                'format': 'email'
+            }
+        },
+        'required': ['email']
+    }, 'createInvitation');
+    ajv.addSchema({
+        'properties': {
+            'id' : {
+                'type': 'number'
+            }
+        },
+        'required': ['id']
+    }, 'acceptInvitation');
+    return ajv;
+};
 
 var initialize = function (router, userHandler) {
+    var ajv = initValidator();
+
     router.get('/',
         passport.authenticate('bearer'),
         function (req, res, next) {
@@ -14,7 +38,7 @@ var initialize = function (router, userHandler) {
     router.post('/',
         passport.authenticate('bearer'),
         function (req, res, next) {
-            if (!validator.isEmpty(req.body.email) && validator.isEmail(req.body.email)) {
+            if (!ajv.validate(req.body, 'createInvitation')) {
                 if (req.user.email === req.body.email) {
                     res.status(500);
                     res.send(ModelError.SelfInvitation);
@@ -29,7 +53,7 @@ var initialize = function (router, userHandler) {
                         res.send(friends);
                     }
                 });
-            } else if (!validator.isNotPresent(req.body.id)) {
+            } else if (!ajv.validate(req.body, 'acceptInvitation')) {
                 userHandler.acceptFriendInvitation(req.user, req.body.id, function (error, friends) {
                     if (error) {
                         res.status(500);
@@ -49,7 +73,7 @@ var initialize = function (router, userHandler) {
     router.delete('/:id',
         passport.authenticate('bearer'),
         function (req, res, next) {
-            userHandler.removeFriend(req.user, req.param('id'), function (error, friends) {
+            userHandler.removeFriend(req.user, req.params.id, function (error, friends) {
                 if (error) {
                     res.status(500);
                     res.send(error);

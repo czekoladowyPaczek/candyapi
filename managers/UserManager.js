@@ -72,7 +72,7 @@ UserManager.prototype.createToken = function (user) {
 UserManager.prototype.inviteFriend = function (user, email, callback) {
     var basicUser = user;
     this.findUserByEmail(email, function (error, user) {
-        if (user && !basicUser.isFriend(user.id)) {
+        if (user && !basicUser.isOnFriendList(user.id)) {
             basicUser.inviteFriend(user, ModelUser.FriendStatus.WAITING_ACCEPTANCE);
             user.inviteFriend(basicUser, ModelUser.FriendStatus.INVITED);
             updateUsers([basicUser, user], function (error) {
@@ -93,7 +93,7 @@ UserManager.prototype.inviteFriend = function (user, email, callback) {
 
 UserManager.prototype.removeFriend = function (user, id, callback) {
     var basicUser = user;
-    if (user.isFriend(id)) {
+    if (user.isOnFriendList(id)) {
         this.findUserById(id, function(err, user) {
             if (user) {
                 basicUser.removeFriend(user.id);
