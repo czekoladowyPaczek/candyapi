@@ -35,6 +35,25 @@ var initValidator = function () {
         },
         'required': ['name', 'listId', 'count', 'type']
     }, 'createShopItem');
+    ajv.addSchema({
+        'properties': {
+            'name': {
+                'type': 'string'
+            },
+            'count': {
+                'type': 'number',
+                'minimum': 0
+            },
+            'type': {
+                'enum': [ModelShopItem.ItemType.GRAM, ModelShopItem.ItemType.KILOGRAM, ModelShopItem.ItemType.LITER,
+                    ModelShopItem.ItemType.MILLILITER, ModelShopItem.ItemType.PIECE]
+            },
+            'bought': {
+                'type': 'number',
+                'minimum': 0
+            }
+        }
+    }, 'updateShopItem');
     return ajv;
 };
 
@@ -123,7 +142,21 @@ var initialize = function (router, shopListManager) {
         '/:listId/item/:itemId',
         passport.authenticate('bearer', {session: false}),
         function (req, res, next) {
+            if (!ajv.validate(req.body, 'updateShopItem')) {
+                res.status(500);
+                return res.send(ModelError.MissingProperties);
+            }
 
+            const args = {
+                'name': req.body.name,
+                'count': req.body.count,
+                'type': req.body.type,
+                'bought': req.body.bought
+            };
+
+            shopListManager.updateShopItem(req.user, req.params.listId, req.params.itemId, args, function (err, listItem) {
+                sendResponse(res, err, listItem);
+            });
         }
     );
 
@@ -131,7 +164,9 @@ var initialize = function (router, shopListManager) {
         '/:listId/item/:itemId',
         passport.authenticate('bearer', {session: false}),
         function (req, res, next) {
-
+            shopListManager.removeShopItem(req.user, req.params.listId, req.params.itemId, function (err) {
+                sendResponse(res, err, {'message': "removed"});
+            });
         }
     );
 

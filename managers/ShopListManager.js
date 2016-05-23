@@ -40,6 +40,23 @@ var deleteList = function (list, callback) {
     });
 };
 
+var getShopItem = function (userId, listId, itemId, callback) {
+    async.parallel([
+        function (callback) {
+            ModelShopList.findOne({_id: listId, 'users._id': userId, deleted: null}, callback);
+        },
+        function (callback) {
+            ModelShopItem.findOne({_id: itemId, 'listId': listId, deleted: null}, callback);
+        }
+    ], function (err, results) {
+        if (err) {
+            callback(err);
+        } else {
+            callback(null, results[0], results[1]);
+        }
+    });
+};
+
 ShopListManager.prototype.createShopList = function (user, listName, callback) {
     userExceededListLimit(user, function (exceeded) {
         if (exceeded) {
@@ -210,6 +227,61 @@ ShopListManager.prototype.createShopItem = function (user, listItem, callback) {
                 });
             });
         }
+    });
+};
+
+ShopListManager.prototype.updateShopItem = function (user, listId, listItemId, args, callback) {
+    getShopItem(user.id, listId, listItemId, function (err, shopList, shopItem) {
+        if (err) {
+            return callback(ModelError.Unknown);
+        } else if (!shopList || !shopItem) {
+            return callback(ModelError.ListNotExist);
+        }
+
+        var changed = false;
+        if (args.name) {
+            shopItem.name = args.name;
+            changed = true;
+        }
+        if (args.count) {
+            shopItem.count = args.count;
+            changed = true;
+        }
+        if (args.type) {
+            shopItem.type = args.type;
+            changed = true;
+        }
+        if (args.bought) {
+            shopItem.bought = args.bought;
+            changed = true;
+        }
+
+        if (changed) {
+            shopItem.save(function (err) {
+                if (err) return callback(ModelError.Unknown);
+
+                callback(null, shopItem);
+            });
+        } else {
+            callback(ModelError.ShopItemNotChanged);
+        }
+    });
+};
+
+ShopListManager.prototype.removeShopItem = function (user, listId, listItemId, callback) {
+    getShopItem(user.id, listId, listItemId, function (err, shopList, shopItem) {
+        if (err) {
+            return callback(ModelError.Unknown);
+        } else if (!shopList || !shopItem) {
+            return callback(ModelError.ListNotExist);
+        }
+
+        shopItem.deleted = Date.now();
+        shopItem.save(function (err) {
+            if (err) return callback(ModelError.Unknown);
+
+            callback(null);
+        });
     });
 };
 
