@@ -12,7 +12,7 @@ var ShopListManager = require('./managers/ShopListManager');
 
 var app = module.exports = express();
 
-var config = require("./config/Config.js")(app.get('env'));
+var config = require("./config/config.js")(app.get('env'));
 var managers = {
     user: new UserManager(config.secret),
     shop: new ShopListManager()
