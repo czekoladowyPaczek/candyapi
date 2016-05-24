@@ -5,6 +5,7 @@ var dev = require('./dev');
 var prod = require('./prod');
 
 var Config = function(env) {
+    console.log('environment: ' + env);
     if (env === 'production') {
         return prod;
     } else {
