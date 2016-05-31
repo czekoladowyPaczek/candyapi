@@ -24,11 +24,8 @@ var initialize = function (router, userHandler) {
         passport.authenticate('bearer', {session: false}),
         function(req, res, next) {
             if (req.user) {
-                var response = {
-                    user: req.user
-                };
                 res.status(200);
-                res.send(response);
+                res.send(req.user);
             } else {
                 res.send(401);
             }
