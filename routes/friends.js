@@ -38,7 +38,7 @@ var initialize = function (router, userHandler) {
     router.post('/',
         passport.authenticate('bearer'),
         function (req, res, next) {
-            if (!ajv.validate(req.body, 'createInvitation')) {
+            if (ajv.validate(req.body, 'createInvitation')) {
                 if (req.user.email === req.body.email) {
                     res.status(500);
                     res.send(ModelError.SelfInvitation);
@@ -53,7 +53,7 @@ var initialize = function (router, userHandler) {
                         res.send(friends);
                     }
                 });
-            } else if (!ajv.validate(req.body, 'acceptInvitation')) {
+            } else if (ajv.validate(req.body, 'acceptInvitation')) {
                 userHandler.acceptFriendInvitation(req.user, req.body.id, function (error, friends) {
                     if (error) {
                         res.status(500);
