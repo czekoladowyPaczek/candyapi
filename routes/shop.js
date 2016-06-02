@@ -117,7 +117,7 @@ var initialize = function (router, shopListManager) {
         '/:listId/item',
         passport.authenticate('bearer', {session: false}),
         function (req, res, next) {
-            if (!ajv.validate(req.body, 'createShopItem')) {
+            if (!ajv.validate('createShopItem', req.body)) {
                 res.status(500);
                 return res.send(ModelError.MissingProperties);
             }
@@ -139,7 +139,7 @@ var initialize = function (router, shopListManager) {
         '/:listId/item/:itemId',
         passport.authenticate('bearer', {session: false}),
         function (req, res, next) {
-            if (!ajv.validate(req.body, 'updateShopItem')) {
+            if (!ajv.validate('updateShopItem', req.body)) {
                 res.status(500);
                 return res.send(ModelError.MissingProperties);
             }

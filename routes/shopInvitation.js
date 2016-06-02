@@ -28,7 +28,7 @@ var initialize = function (router, shopListManager) {
         '/',
         passport.authenticate('bearer', {session: false}),
         function (req, res, next) {
-            if (!ajv.validate(req.body, 'invitation')) {
+            if (!ajv.validate('invitation', req.body)) {
                 res.status(500);
                 res.send(ModelError.MissingProperties);
             } else if (req.user.id == req.body.userId) {
@@ -52,7 +52,7 @@ var initialize = function (router, shopListManager) {
         '/',
         passport.authenticate('bearer', {session: false}),
         function (req, res, next) {
-            if (!ajv.validate(req.body, 'invitation')) {
+            if (!ajv.validate('invitation', req.body)) {
                 res.status(500);
                 res.send(ModelError.MissingProperties);
                 return;
