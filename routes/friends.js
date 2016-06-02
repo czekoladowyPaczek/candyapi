@@ -15,11 +15,11 @@ var initValidator = function() {
     }, 'createInvitation');
     ajv.addSchema({
         'properties': {
-            'id' : {
+            'userId' : {
                 'type': 'number'
             }
         },
-        'required': ['id']
+        'required': ['userId']
     }, 'acceptInvitation');
     return ajv;
 };
@@ -54,7 +54,7 @@ var initialize = function (router, userHandler) {
                     }
                 });
             } else if (ajv.validate(req.body, 'acceptInvitation')) {
-                userHandler.acceptFriendInvitation(req.user, req.body.id, function (error, friends) {
+                userHandler.acceptFriendInvitation(req.user, req.body.userId, function (error, friends) {
                     if (error) {
                         res.status(500);
                         res.send(error);
