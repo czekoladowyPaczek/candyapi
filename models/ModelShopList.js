@@ -49,6 +49,10 @@ var ListSchema = new Schema({
     users: {
         type: [UserSchema]
     },
+    created: {
+        type: Date,
+        default: Date.now
+    },
     modification_date: {
         type: Date,
         default: Date.now
