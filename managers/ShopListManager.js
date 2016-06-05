@@ -7,7 +7,7 @@ var ModelUser = require('../models/ModelUser');
 var ModelError = require('../models/ModelError');
 var async = require('async');
 
-var USER_LIST_COUNT_LIMIT = 5;
+var USER_LIST_COUNT_LIMIT = 15;
 var USER_LIST_SIZE_LIMIT = 100;
 
 var ShopListManager = function () {
@@ -79,7 +79,7 @@ ShopListManager.prototype.createShopList = function (user, listName, callback) {
 };
 
 ShopListManager.prototype.getShopLists = function (user, callback) {
-    ModelShopList.find({'users._id': user.id, deleted: null}, function (err, lists) {
+    ModelShopList.find({'users._id': user.id, deleted: null}).sort('-created').exec(function (err, lists) {
         if (err) {
             callback(ModelError.Unknown);
         } else {
