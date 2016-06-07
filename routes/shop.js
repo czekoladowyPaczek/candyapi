@@ -6,6 +6,8 @@ var ModelError = require('../models/ModelError');
 var ModelShopItem = require('../models/ModelShopItem');
 var Ajv = require('ajv');
 
+var LENGTH_LIMIT = 50;
+
 var initValidator = function () {
     var ajv = new Ajv({});
     ajv.addSchema({
@@ -85,7 +87,13 @@ var initialize = function (router, shopListManager) {
                 res.status(500);
                 res.send(ModelError.MissingProperties);
             } else {
-                shopListManager.createShopList(req.user, req.body.name, function (err, createdList) {
+                var name;
+                if (req.body.name.length() > LENGTH_LIMIT) {
+                    name = req.body.name.substring(0, LENGTH_LIMIT);
+                } else {
+                    name = req.body.name;
+                }
+                shopListManager.createShopList(req.user, name, function (err, createdList) {
                     sendResponse(res, err, createdList);
                 });
             }
@@ -121,9 +129,14 @@ var initialize = function (router, shopListManager) {
                 res.status(500);
                 return res.send(ModelError.MissingProperties);
             }
-
+            var name;
+            if (req.body.name.length() > LENGTH_LIMIT) {
+                name = req.body.name.substring(0, LENGTH_LIMIT);
+            } else {
+                name = req.body.name;
+            }
             var shopItem = new ModelShopItem({
-                name: req.body.name,
+                name: name,
                 listId: req.params.listId,
                 count: req.body.count,
                 metric: req.body.metric
@@ -143,9 +156,14 @@ var initialize = function (router, shopListManager) {
                 res.status(500);
                 return res.send(ModelError.MissingProperties);
             }
-
+            var name;
+            if (req.body.name && req.body.name.length() > LENGTH_LIMIT) {
+                name = req.body.name.substring(0, LENGTH_LIMIT);
+            } else {
+                name = req.body.name;
+            }
             const args = {
-                'name': req.body.name,
+                'name': name,
                 'count': req.body.count,
                 'metric': req.body.metric,
                 'bought': req.body.bought
