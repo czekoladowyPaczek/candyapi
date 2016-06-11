@@ -79,6 +79,16 @@ var initialize = function (router, shopListManager) {
         }
     );
 
+    router.get(
+        '/:id',
+        passport.authenticate('bearer', {session: false}),
+        function (req, res, next) {
+            shopListManager.getShopList(req.user, req.params.id, function (err, list) {
+                sendResponse(res, err, list);
+            });
+        }
+    );
+
     router.post(
         '/',
         passport.authenticate('bearer', {session: false}),
@@ -112,7 +122,7 @@ var initialize = function (router, shopListManager) {
     );
 
     router.get(
-        '/:id',
+        '/:id/item',
         passport.authenticate('bearer', {session: false}),
         function (req, res, next) {
             shopListManager.getShopListItems(req.user, req.params.id, function (err, items) {

@@ -79,7 +79,17 @@ ShopListManager.prototype.createShopList = function (user, listName, callback) {
 };
 
 ShopListManager.prototype.getShopLists = function (user, callback) {
-    ModelShopList.find({'users._id': user.id, deleted: null}).sort('-created').exec(function (err, lists) {
+    ModelShopList.findOne({'users._id': user.id, deleted: null}).sort('-created').exec(function (err, list) {
+        if (err) {
+            callback(ModelError.Unknown);
+        } else {
+            callback(null, list);
+        }
+    });
+};
+
+ShopListManager.prototype.getShopList = function (user, shopId, callback) {
+    ModelShopList.find({'_id': shopId, 'users._id': user.id, deleted: null}).sort('-created').exec(function (err, lists) {
         if (err) {
             callback(ModelError.Unknown);
         } else {
