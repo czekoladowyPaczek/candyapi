@@ -98,7 +98,7 @@ var initialize = function (router, shopListManager) {
                 res.send(ModelError.MissingProperties);
             } else {
                 var name;
-                if (req.body.name.length() > LENGTH_LIMIT) {
+                if (req.body.name.length > LENGTH_LIMIT) {
                     name = req.body.name.substring(0, LENGTH_LIMIT);
                 } else {
                     name = req.body.name;
@@ -140,7 +140,7 @@ var initialize = function (router, shopListManager) {
                 return res.send(ModelError.MissingProperties);
             }
             var name;
-            if (req.body.name.length() > LENGTH_LIMIT) {
+            if (req.body.name.length > LENGTH_LIMIT) {
                 name = req.body.name.substring(0, LENGTH_LIMIT);
             } else {
                 name = req.body.name;
